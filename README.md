@@ -1,50 +1,50 @@
-[简体中文](README.zh-CN.md)
+[English](README.en.md)
 
-# SneakFall
+# SneakFall 轻功
 
-> **Hold the sneak key while falling to reduce fall damage.**
-> NeoForge 1.21.1 · Minecraft 1.21.1 · Open-source mod (GPL-3.0)
+> 坠落时按住潜行，减免摔落伤害。
+> NeoForge 1.21.1 · Minecraft 1.21.1 · 开源模组（GPL-3.0）
 
-SneakFall is a NeoForge mod: hold the sneak key while falling to reduce fall damage according to configurable rules. Reduction rules are divided into "stages" by fall-height ranges; each stage independently configures its trigger mode and reduction method.
+SneakFall（轻功）是 NeoForge 模组。玩家从高处往下掉的时候按住潜行键，摔落伤害就按配置里的规则减免。规则按坠落高度分成若干阶段，每个阶段自己定触发方式和减免算法。
 
-## What it is
+## 是什么
 
-### Trigger modes
+### 触发模式（mode）
 
-| Mode | Meaning |
+| 模式 | 含义 |
 | --- | --- |
-| `SUSTAIN` | Reduction applies if sneak is held at the moment of landing |
-| `QTE` | After pressing sneak, you must land within the time window for reduction to apply |
+| `SUSTAIN` | 落地那一刻按着潜行就减免 |
+| `QTE` | 按下潜行后要在时间窗口里落地，窗口外落地不算 |
 
-QTE windows are configured in seconds (1 s = 20 game ticks at runtime); releasing sneak resets the timer.
+QTE 窗口按秒配置，运行时 1 秒 = 20 游戏刻。松开潜行，计时清零重来。
 
-### Reduction methods
+### 减免计算方式（reductionMode）
 
-| Mode | Meaning |
+| 模式 | 含义 |
 | --- | --- |
-| `DISTANCE` | Reduces the equivalent fall distance by N blocks before damage is computed |
-| `PERCENT` | Scales damage: final = original × (1 − ratio), ratio capped at 1 |
+| `DISTANCE` | 算伤害前先从坠落距离里扣掉 N 格 |
+| `PERCENT` | 按比例缩放伤害：最终 = 原始 × (1 − 比例)，超过 1 按 1 算 |
 
-### Height ranges and fallback
+### 高度区间与保底
 
-- Height ranges match stages by half-open intervals `[min, max)`, e.g. `"3.0~20.0"`, `"10~"` (no upper bound), `"~10"` (no lower bound), `"all"` (any height).
-- Stages match in order; the first match wins.
-- If no stage matches (including gaps), the **fallback** config in the `general` group applies; the default fallback provides no reduction (`fallbackReductionValue = 0.0`) so fall damage is never unexpectedly negated.
-- A single malformed config line only skips that stage; it never prevents server startup.
+- 区间是半开区间 `[min, max)`，可以写 `"3.0~20.0"`、`"10~"`（没有上界）、`"~10"`（没有下界）、`"all"`（所有高度）。
+- 阶段按顺序往下比，命中第一个就停。
+- 一个都没命中（包括区间之间的空隙）时，用 `general` 分组里的保底（fallback）配置。默认保底不减免（`fallbackReductionValue = 0.0`），免得玩家莫名其妙摔不死。
+- 某一行写坏了只跳过那一个阶段，服务器照常启动。
 
-### Default built-in stage
+### 默认内置阶段
 
-| Height range | Mode | QTE window | Reduction | Value |
+| 高度区间 | 模式 | QTE 窗口 | 减免方式 | 减免值 |
 | --- | --- | --- | --- | --- |
-| `3.0~20.0` | QTE | 0.4 s | DISTANCE | 1.5 blocks |
+| `3.0~20.0` | QTE | 0.4 s | DISTANCE | 1.5 格 |
 
-## How to use
+## 怎么用
 
-### Configuration
+### 配置文件
 
-On first launch, `config/sneakfall-common.toml` is generated automatically (with full Chinese comments). Config is read dynamically per event, so changes take effect via `/reload` (NeoForge) or a restart — no need to restart the game manually.
+首次启动会生成 `config/sneakfall-common.toml`，注释是中文的。配置在每次事件触发时重新读取，改完用 `/reload`（NeoForge）就生效，重启游戏也一样。
 
-Default configuration:
+默认内容：
 
 ```toml
 #SneakFall（潜行摔落减免）总体说明。
@@ -84,64 +84,65 @@ Default configuration:
 	reductionValues = [1.5]
 ```
 
-### Building
+### 构建
 
 ```bash
 ./gradlew build        # Linux / macOS
 gradlew.bat build      # Windows
 ```
 
-The build artifact is in `build/libs/` (`sneakfall-<version>.jar`); drop it into your Minecraft instance's `mods/` directory.
+构建产物在 `build/libs/`（`sneakfall-<版本>.jar`），丢进 Minecraft 实例的 `mods/` 目录就能用。
 
-> If Gradle downloads are slow or time out (common in mainland China), replace the `distributionUrl` in `gradle/wrapper/gradle-wrapper.properties` with a mirror (e.g. Tencent Cloud `https://mirrors.cloud.tencent.com/gradle/...`).
+> 国内下载 Gradle 慢或者超时的话，把 `gradle/wrapper/gradle-wrapper.properties` 里的
+> `distributionUrl` 换成镜像源，比如腾讯云 `https://mirrors.cloud.tencent.com/gradle/...`。
 
-## Layout
+## 目录
 
-Development documents in `docs/` record the mod's journey from design to delivery:
+开发过程中的文档都在 `docs/`：
 
-| Document | Contents |
+| 文档 | 内容 |
 | --- | --- |
-| `DESIGN_SPEC.md` | Overall design spec: goals, mechanics design, config scheme |
-| `SKELETON_REPORT.md` | Project skeleton setup record (build script, mods.toml) |
-| `MECHANICS_REPORT.md` | Fall damage mechanics and similar-mod research |
-| `API_REPORT.md` | NeoForge/event API signatures used, verification record |
-| `BUILD_REPORT.md` | Build and verification record (JDK, Gradle, jar output) |
-| `CONFIG_FIX_REPORT.md` | Config serialization crash fix record (parallel-list scheme, fallback) |
+| `DESIGN_SPEC.md` | 总体设计说明：目标、机制设计、配置方案 |
+| `SKELETON_REPORT.md` | 项目骨架搭建记录（构建脚本、mods.toml） |
+| `MECHANICS_REPORT.md` | 摔落伤害机制与同类模组调研 |
+| `API_REPORT.md` | 所用 NeoForge/事件 API 签名验证记录 |
+| `BUILD_REPORT.md` | 编译与验证记录（JDK、Gradle、jar 输出） |
+| `CONFIG_FIX_REPORT.md` | 配置序列化崩溃修复记录（平行列表方案、保底机制） |
 
 ```
 sneakfall/
-├── build.gradle            # Build script (NeoForge 1.21.1)
-├── gradle.properties       # Gradle / mod properties (mod_id, version)
-├── settings.gradle         # Project settings
-├── gradlew / gradlew.bat   # Gradle Wrapper launch scripts
-├── gradle/wrapper/         # Wrapper (gradle-wrapper.jar + properties)
+├── build.gradle            # 构建脚本（NeoForge 1.21.1）
+├── gradle.properties       # Gradle / 模组属性（mod_id、版本）
+├── settings.gradle         # 工程设置
+├── gradlew / gradlew.bat   # Gradle Wrapper 启动脚本
+├── gradle/wrapper/         # Wrapper（gradle-wrapper.jar + properties）
 ├── src/
 │   ├── main/java/me/shinano/sneakfall/
-│   │   ├── SneakFall.java           # Mod entry point and event registration
-│   │   ├── SneakFallConfig.java     # Config definition / stage parsing / fallback
-│   │   ├── SneakFallTracker.java    # Fall distance and sneak state tracking
-│   │   └── FallDamageHandler.java   # Fall damage reduction handling
+│   │   ├── SneakFall.java           # 模组入口与事件注册
+│   │   ├── SneakFallConfig.java     # 配置定义 / 阶段解析 / 保底
+│   │   ├── SneakFallTracker.java    # 坠落距离与潜行状态追踪
+│   │   └── FallDamageHandler.java   # 摔落伤害减免处理
 │   └── main/resources/META-INF/
-│       └── neoforge.mods.toml       # Mod metadata (license: GPL-3.0)
-├── docs/                   # Development documents
-├── README.md               # This file
-├── README.zh-CN.md         # Chinese version
+│       └── neoforge.mods.toml       # 模组元数据（license: GPL-3.0）
+├── docs/                   # 开发文档
+├── README.md               # 本文件（中文）
+├── README.en.md            # 英文版
 └── .gitignore
 ```
 
-## Requirements
+## 依赖
 
-- **JDK 21** (build)
-- **Gradle 8.x**: the wrapper is bundled, no separate install needed
-- **NeoForge 21.1+ / Minecraft 1.21.1** (runtime)
+- JDK 21（编译）
+- Gradle 8.x：仓库自带 wrapper，不用另装
+- NeoForge 21.1+ / Minecraft 1.21.1（运行）
 
-## Scope
+## 边界
 
-- Stage config uses five equal-length parallel lists instead of `[[stages]]` array tables — the underlying config library does not support nested object arrays. Mismatched lengths are truncated to the shortest.
-- A malformed config line skips only that stage and never blocks server startup; conversely, mistakes are silent and have to be found in the log.
-- The QTE window starts when sneak is pressed and resets on release; repeated taps keep resetting the timer.
-- The fallback reduces nothing by default — failing safe beats accidentally negating fall damage.
+- 阶段配置是五条等长平行列表，用不了 `[[stages]]` 数组表，因为底层配置库不支持嵌套对象数组。五个列表长短不一时按最短的截断。
+- 某一行解析失败只跳过该阶段，不拦服务器启动。反过来，写错了不会当场报错，得翻日志。
+- QTE 窗口从按下潜行起算，松开归零。连续点按会一直重置计时。
+- 保底默认不减免。什么都不做，好过意外把摔落伤害抹平。
 
-## License
+## 许可
 
-This mod is released under **GPL-3.0**. See the `LICENSE` file in the repository root.
+本模组按 GPL-3.0 发布，全文在仓库根目录的 `LICENSE` 里。
