@@ -7,9 +7,7 @@
 
 SneakFall（轻功）是一个 NeoForge 模组：玩家从高处坠落时按住潜行（Sneak），即可按配置规则减免摔落伤害。减免规则按坠落高度区间划分为多个"阶段"，每个阶段可独立配置触发模式与减免计算方式。
 
----
-
-## 核心机制
+## 是什么
 
 ### 触发模式（mode）
 
@@ -40,9 +38,9 @@ QTE 窗口以秒为单位配置（运行时按 1 秒 = 20 游戏刻换算），�
 | --- | --- | --- | --- | --- |
 | `3.0~20.0` | QTE | 0.4 s | DISTANCE | 1.5 格 |
 
----
+## 怎么用
 
-## 配置文件
+### 配置文件
 
 首次启动时自动生成 `config/sneakfall-common.toml`（含全部中文注释，可直接阅读修改）。配置在事件触发时动态读取，游戏内无需重启即可通过 `/reload`（NeoForge）或重启生效。
 
@@ -86,11 +84,7 @@ QTE 窗口以秒为单位配置（运行时按 1 秒 = 20 游戏刻换算），�
 	reductionValues = [1.5]
 ```
 
----
-
-## 构建方法
-
-要求：**JDK 21**（Gradle 8.x，NeoForge 21.1+）。
+### 构建
 
 ```bash
 ./gradlew build        # Linux / macOS
@@ -102,11 +96,9 @@ gradlew.bat build      # Windows
 > 国内网络构建慢或超时时，可将 `gradle/wrapper/gradle-wrapper.properties` 中的
 > `distributionUrl` 替换为镜像源（如腾讯云 `https://mirrors.cloud.tencent.com/gradle/...`）。
 
----
+## 目录
 
-## 文档目录（docs/）
-
-开发文档，记录本模组从设计到交付的过程：
+开发文档在 `docs/`，记录本模组从设计到交付的过程：
 
 | 文档 | 内容 |
 | --- | --- |
@@ -116,10 +108,6 @@ gradlew.bat build      # Windows
 | `API_REPORT.md` | 所用 NeoForge/事件 API 签名验证记录 |
 | `BUILD_REPORT.md` | 编译与验证记录（JDK、Gradle、jar 输出） |
 | `CONFIG_FIX_REPORT.md` | 配置序列化崩溃修复记录（平行列表方案、保底机制） |
-
----
-
-## 目录结构
 
 ```
 sneakfall/
@@ -137,11 +125,23 @@ sneakfall/
 │   └── main/resources/META-INF/
 │       └── neoforge.mods.toml       # 模组元数据（license: GPL-3.0）
 ├── docs/                   # 开发文档
-├── README.md
+├── README.md               # 英文版
+├── README.zh-CN.md         # 本文件
 └── .gitignore
 ```
 
----
+## 依赖
+
+- **JDK 21**（编译）
+- **Gradle 8.x**：仓库自带 wrapper，不必单独安装
+- **NeoForge 21.1+ / Minecraft 1.21.1**（运行）
+
+## 边界
+
+- 阶段配置用五条等长平行列表表示，不是 `[[stages]]` 数组表——底层配置库不支持嵌套对象数组。五个列表长度不一致时按最短截断。
+- 某一行配置解析失败只跳过该阶段，不阻止服务器启动；反过来说，写错了不会当场报错，要查日志。
+- QTE 窗口从按下潜行起算，松开即归零。连续点按会不断重置计时。
+- 保底默认不减免，宁可失效也不误免。
 
 ## 许可
 

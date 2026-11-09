@@ -7,9 +7,7 @@
 
 SneakFall is a NeoForge mod: hold the sneak key while falling to reduce fall damage according to configurable rules. Reduction rules are divided into "stages" by fall-height ranges; each stage independently configures its trigger mode and reduction method.
 
----
-
-## Core Mechanics
+## What it is
 
 ### Trigger modes
 
@@ -40,9 +38,9 @@ QTE windows are configured in seconds (1 s = 20 game ticks at runtime); releasin
 | --- | --- | --- | --- | --- |
 | `3.0~20.0` | QTE | 0.4 s | DISTANCE | 1.5 blocks |
 
----
+## How to use
 
-## Configuration
+### Configuration
 
 On first launch, `config/sneakfall-common.toml` is generated automatically (with full Chinese comments). Config is read dynamically per event, so changes take effect via `/reload` (NeoForge) or a restart — no need to restart the game manually.
 
@@ -86,11 +84,7 @@ Default configuration:
 	reductionValues = [1.5]
 ```
 
----
-
-## Building
-
-Requires **JDK 21** (Gradle 8.x, NeoForge 21.1+).
+### Building
 
 ```bash
 ./gradlew build        # Linux / macOS
@@ -101,11 +95,9 @@ The build artifact is in `build/libs/` (`sneakfall-<version>.jar`); drop it into
 
 > If Gradle downloads are slow or time out (common in mainland China), replace the `distributionUrl` in `gradle/wrapper/gradle-wrapper.properties` with a mirror (e.g. Tencent Cloud `https://mirrors.cloud.tencent.com/gradle/...`).
 
----
+## Layout
 
-## Documentation (docs/)
-
-Development documents recording the mod's journey from design to delivery:
+Development documents in `docs/` record the mod's journey from design to delivery:
 
 | Document | Contents |
 | --- | --- |
@@ -115,10 +107,6 @@ Development documents recording the mod's journey from design to delivery:
 | `API_REPORT.md` | NeoForge/event API signatures used, verification record |
 | `BUILD_REPORT.md` | Build and verification record (JDK, Gradle, jar output) |
 | `CONFIG_FIX_REPORT.md` | Config serialization crash fix record (parallel-list scheme, fallback) |
-
----
-
-## Project Layout
 
 ```
 sneakfall/
@@ -136,11 +124,23 @@ sneakfall/
 │   └── main/resources/META-INF/
 │       └── neoforge.mods.toml       # Mod metadata (license: GPL-3.0)
 ├── docs/                   # Development documents
-├── README.md
+├── README.md               # This file
+├── README.zh-CN.md         # Chinese version
 └── .gitignore
 ```
 
----
+## Requirements
+
+- **JDK 21** (build)
+- **Gradle 8.x**: the wrapper is bundled, no separate install needed
+- **NeoForge 21.1+ / Minecraft 1.21.1** (runtime)
+
+## Scope
+
+- Stage config uses five equal-length parallel lists instead of `[[stages]]` array tables — the underlying config library does not support nested object arrays. Mismatched lengths are truncated to the shortest.
+- A malformed config line skips only that stage and never blocks server startup; conversely, mistakes are silent and have to be found in the log.
+- The QTE window starts when sneak is pressed and resets on release; repeated taps keep resetting the timer.
+- The fallback reduces nothing by default — failing safe beats accidentally negating fall damage.
 
 ## License
 
