@@ -140,7 +140,7 @@ sneakfall/
 - Stages are five equal-length parallel lists rather than `[[stages]]` array tables, because the config library underneath cannot handle arrays of nested objects. Lists of different lengths are truncated to the shortest.
 - A malformed line skips its stage instead of blocking startup. The trade-off is silence: mistakes only show up in the log.
 - The QTE window starts on the sneak press and clears on release, so tapping again keeps pushing it back.
-- The fallback reduces nothing by default. Failing safe beats cancelling fall damage by accident.
+- The fallback reduces nothing by default, so fall damage is never cancelled by accident.
 
 ## License
 
